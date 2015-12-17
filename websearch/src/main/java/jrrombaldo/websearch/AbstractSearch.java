@@ -1,7 +1,11 @@
 package jrrombaldo.websearch;
 
+import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.CookieHandler;
 import java.net.CookieManager;
@@ -20,11 +24,11 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.text.MessageFormat;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.imageio.ImageIO;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -61,17 +65,21 @@ public abstract class AbstractSearch {
 	public AbstractSearch(String targetDomain) {
 		this._targetDomain = targetDomain;
 		this._subDomainsFounded = new HashSet<String>();
+
+		// ensure that cookies will be persisted
+		CookieHandler.setDefault(new CookieManager(null, CookiePolicy.ACCEPT_ALL));
 	}
 
-	abstract void handleCaptcha(URL url, int httpStatusCode, int httpLength, String content) throws MalformedURLException, IOException, URISyntaxException, Exception;
+	abstract void handleCaptcha(URL url, int httpStatusCode, String content)
+			throws MalformedURLException, IOException, URISyntaxException, Exception;
 
-	protected String makeURL(final int page) throws Exception {
-		final StringBuilder sb = new StringBuilder();
+	protected String makeURL(int page) throws Exception {
+		StringBuilder sb = new StringBuilder();
 		sb.append(this._dork_include);
 		sb.append(this._targetDomain);
 
 		int count = 0;
-		for (final String subDomain : this._subDomainsFounded) {
+		for (String subDomain : this._subDomainsFounded) {
 			sb.append("+");
 			sb.append(this._dork_exclude);
 			sb.append(subDomain);
@@ -85,36 +93,35 @@ public abstract class AbstractSearch {
 
 	protected HttpURLConnection getHTTPConnection(URL url) throws MalformedURLException, Exception, IOException {
 		URLConnection urlConnection;
-		
-		
-		
+
+		// ignoring SSL server certificate
+		confidInavlidSSL();
+
 		if (this._useProxy) {
-			final Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(this._proxy, this._proxyPort));
+			Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(this._proxy, this._proxyPort));
 
 			urlConnection = url.openConnection(proxy);
 		} else {
 			urlConnection = url.openConnection();
 		}
 		urlConnection.addRequestProperty("User-agent", this._userAgent);
-//		urlConnection.addRequestProperty("Cookie", this._captchaExempltionCookie);
-		
-		HttpURLConnection conn =  ((HttpURLConnection) urlConnection);
-		List<String>cookies = conn.getHeaderFields().get("Set-Cookie");
-		if (cookies != null)
-			this._captchaExempltionCookie = conn.getHeaderFields().get("Set-Cookie").get(0);
 
-		return conn;
-	}
-
-	protected String parsetHTTPContent(final int pageNumber) throws Exception {
-		confidInavlidSSL();
-		final URL url = new URL(makeURL(pageNumber));
-		final HttpURLConnection httpConnection = getHTTPConnection(url);
-
+		HttpURLConnection httpConnection = ((HttpURLConnection) urlConnection);
 		// httpConnection.setInstanceFollowRedirects(false);
 
 		int httpStatusCode = httpConnection.getResponseCode();
 		int httpLength = httpConnection.getContentLength();
+		System.out.println(MessageFormat.format("\t -> Status:[{0}]  -  Len:[{1}]  -  {2}",httpStatusCode, httpLength, url));
+
+
+		return httpConnection;
+	}
+
+	protected String parsetHTTPContent(int pageNumber) throws Exception {
+		URL url = new URL(makeURL(pageNumber));
+		HttpURLConnection httpConnection = getHTTPConnection(url);
+
+		int httpStatusCode = httpConnection.getResponseCode();
 
 		String line;
 
@@ -133,30 +140,25 @@ public abstract class AbstractSearch {
 
 			// most likely the search engine is asking for capatcha
 			if (httpStatusCode == 503) {
-				handleCaptcha(url, httpStatusCode, httpLength, sb.toString());
+				handleCaptcha(url, httpStatusCode, sb.toString());
 			}
 
-		} catch (final IOException e) {
+		} catch (IOException e) {
 			// System.out.println("minor error, still processing... " +
 			// e.getLocalizedMessage());
 			e.printStackTrace();
 		}
 
-		System.out.println(new StringBuilder().append("\t -> ").append(" ContentLength: ").append(httpLength)
-				.append("\tStatusCode: ").append(httpStatusCode).append("\t-\t").append(url));
-
 		return sb.toString();
 	}
 
-	protected int extractDomains(final int pageNumber) throws Exception {
-		final String content = parsetHTTPContent(pageNumber);
-		// System.out.println(new StringBuilder().append("regex
-		// ->").append(this.regex).toString());
+	protected int extractDomains(int pageNumber) throws Exception {
+		String content = parsetHTTPContent(pageNumber);
 
-		final Pattern pattern = Pattern.compile(this._regex);
-		final Matcher matcher = pattern.matcher(content);
+		Pattern pattern = Pattern.compile(this._regex);
+		Matcher matcher = pattern.matcher(content);
 
-		final int sizeBefore = this._subDomainsFounded.size();
+		int sizeBefore = this._subDomainsFounded.size();
 
 		while (matcher.find()) {
 			String fnd = matcher.group();
@@ -173,8 +175,8 @@ public abstract class AbstractSearch {
 			this._subDomainsFounded.add(fnd);
 		}
 
-		final int founds = (this._subDomainsFounded.size() - sizeBefore);
-		System.out.println("\t found : " + founds);
+		int founds = (this._subDomainsFounded.size() - sizeBefore);
+		System.out.println(MessageFormat.format("\t    Founded:[{0}]\n", founds));
 		return founds;
 	}
 
@@ -204,6 +206,17 @@ public abstract class AbstractSearch {
 		return this._subDomainsFounded;
 	}
 
+	// used to download captcha images
+	protected void downloadImage(String strURL, String imagePath) throws MalformedURLException, IOException, Exception {
+		HttpURLConnection imageUrlConnection;
+		imageUrlConnection = this.getHTTPConnection(new URL(strURL));
+
+		InputStream is = new BufferedInputStream(imageUrlConnection.getInputStream());
+		BufferedImage image = ImageIO.read(is);
+
+		ImageIO.write(image, "jpg", new File(imagePath));
+	}
+
 	protected void setProxy(String proxy, int port) {
 		this._useProxy = true;
 		this._proxy = proxy;
@@ -211,14 +224,12 @@ public abstract class AbstractSearch {
 	}
 
 	protected void confidInavlidSSL() throws NoSuchAlgorithmException, KeyManagementException {
-		final SSLContext ctx = SSLContext.getInstance("TLS");
+		SSLContext ctx = SSLContext.getInstance("TLS");
 		ctx.init(new KeyManager[0], new TrustManager[] { new X509TrustManager() {
-			public void checkClientTrusted(final X509Certificate[] arg0, final String arg1)
-					throws CertificateException {
+			public void checkClientTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
 			}
 
-			public void checkServerTrusted(final X509Certificate[] arg0, final String arg1)
-					throws CertificateException {
+			public void checkServerTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
 			}
 
 			public X509Certificate[] getAcceptedIssuers() {
