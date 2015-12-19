@@ -8,9 +8,13 @@ package jrrombaldo.websearch.gui;
 import java.awt.Color;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.AbstractListModel;
 import javax.swing.JTextArea;
 import javax.swing.SwingWorker;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeModel;
 import jrrombaldo.websearch.BingSearch;
 import jrrombaldo.websearch.GoogleSearch;
 
@@ -48,7 +52,7 @@ public class WebSearchMainForm extends javax.swing.JFrame {
         jButton4 = new javax.swing.JButton();
         jButton5 = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
-        resultList = new javax.swing.JList<>();
+        resultList = new javax.swing.JTree();
         jScrollPane4 = new javax.swing.JScrollPane();
         consoleTxt = new javax.swing.JTextArea();
         jLabel2 = new javax.swing.JLabel();
@@ -137,6 +141,8 @@ public class WebSearchMainForm extends javax.swing.JFrame {
         desktopPane1.add(jTabbedPane3);
         jTabbedPane3.setBounds(40, 130, 360, 210);
 
+        javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("...");
+        resultList.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
         jScrollPane3.setViewportView(resultList);
 
         desktopPane1.add(jScrollPane3);
@@ -260,7 +266,8 @@ public class WebSearchMainForm extends javax.swing.JFrame {
     }//GEN-LAST:event_exitMenuItemActionPerformed
 
     private void goTxtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_goTxtActionPerformed
-        // TODO add your handling code here:
+
+        new DoSearchInBackgorund().execute();
     }//GEN-LAST:event_goTxtActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
@@ -293,7 +300,7 @@ public class WebSearchMainForm extends javax.swing.JFrame {
         }
         //</editor-fold>
         //</editor-fold>
-        
+
         //</editor-fold>
         //</editor-fold>
 
@@ -331,7 +338,7 @@ public class WebSearchMainForm extends javax.swing.JFrame {
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JMenuItem openMenuItem;
     private javax.swing.JMenuItem pasteMenuItem;
-    private javax.swing.JList<String> resultList;
+    private javax.swing.JTree resultList;
     private javax.swing.JMenuItem saveAsMenuItem;
     private javax.swing.JMenuItem saveMenuItem;
     private javax.swing.JTextField targetTxt;
@@ -344,47 +351,58 @@ public class WebSearchMainForm extends javax.swing.JFrame {
         mc.setMessageLines(99999);
     }
 
-    class DoSearchInBackgorund extends SwingWorker<String, Object> {
+    class DoSearchInBackgorund extends SwingWorker<String, String> {
 
         @Override
         protected String doInBackground() throws Exception {
             final Set<String> results = new HashSet<>();
+            try {
+                String domain = targetTxt.getText();
 
-            String domain = targetTxt.getText();
-
-            if (googleChckBox.isSelected()) {
-                GoogleSearch google = new GoogleSearch(domain);
-                try {
-                    results.addAll(google.listSubdomains());
-                } catch (Exception e1) {
-                    e1.printStackTrace();
+                if (googleChckBox.isSelected()) {
+                    GoogleSearch google = new GoogleSearch(domain);
+                    try {
+                        results.addAll(google.listSubdomains());
+                    } catch (Exception e1) {
+                        e1.printStackTrace();
+                    }
                 }
+                if (bingChckBox.isSelected()) {
+                    BingSearch bing = new BingSearch(domain);
+                    try {
+                        results.addAll(bing.listSubdomains());
+                    } catch (Exception e1) {
+                        e1.printStackTrace();
+                    }
+
+                }
+
+                DefaultMutableTreeNode rootDomain = new DefaultMutableTreeNode(domain);
+                resultList.setModel(new javax.swing.tree.DefaultTreeModel(rootDomain));
+
+                for (String subDomain : results) {
+                    rootDomain.add(new DefaultMutableTreeNode(subDomain + domain));
+                }
+                resultList.expandRow(0);
+                resultList.setEditable(false);
+
+//            resultList.setModel(new AbstractListModel<String>() {
+//                private static final long serialVersionUID = -69543809995934521L;
+//                String[] values = results.toArray(new String[results.size()]);
+//
+//                @Override
+//                public int getSize() {
+//                    return values.length;
+//                }
+//
+//                @Override
+//                public String getElementAt(int index) {
+//                    return values[index] + targetTxt.getText();
+//                }
+//            });
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
-            if (bingChckBox.isSelected()) {
-                BingSearch bing = new BingSearch(domain);
-                try {
-                    results.addAll(bing.listSubdomains());
-                } catch (Exception e1) {
-                    e1.printStackTrace();
-                }
-
-            }
-
-            resultList.setModel(new AbstractListModel<String>() {
-                private static final long serialVersionUID = -69543809995934521L;
-                String[] values = results.toArray(new String[results.size()]);
-
-                @Override
-                public int getSize() {
-                    return values.length;
-                }
-
-                @Override
-                public String getElementAt(int index) {
-                    return values[index] + targetTxt.getText();
-                }
-            });
-
             return "Done.";
         }
 
