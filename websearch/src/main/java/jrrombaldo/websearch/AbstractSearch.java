@@ -48,10 +48,10 @@ public abstract class AbstractSearch {
 	protected String _captchaExempltionCookie;
 
 	// performance improvements
-	protected int _dork_max = 30;
+	protected int _dork_max = 100;
 	protected int _page_max_empty = 2;
-	protected int _page_max_num = 3;
-	protected int _pasge_size = 10;
+	protected int _page_max_num = 30;
+	protected int _page_size = 10;
 
 	// proxy usage
 	protected boolean _useProxy;
@@ -111,8 +111,7 @@ public abstract class AbstractSearch {
 
 		int httpStatusCode = httpConnection.getResponseCode();
 		int httpLength = httpConnection.getContentLength();
-		System.out.println(MessageFormat.format("\t -> Status:[{0}]  -  Len:[{1}]  -  {2}",httpStatusCode, httpLength, url));
-
+		System.out.println(MessageFormat.format("Requesting - [{0}] - {1}",httpStatusCode, url));
 
 		return httpConnection;
 	}
@@ -176,7 +175,7 @@ public abstract class AbstractSearch {
 		}
 
 		int founds = (this._subDomainsFounded.size() - sizeBefore);
-		System.out.println(MessageFormat.format("\t    Founded:[{0}]\n", founds));
+		System.out.println(MessageFormat.format("Subdomains founded:[{0}]\n", founds));
 		return founds;
 	}
 
@@ -191,7 +190,7 @@ public abstract class AbstractSearch {
 			if (total == 0) {
 				int emptyPage = 0;
 				for (int pg = 0; pg < this._page_max_num && emptyPage < this._page_max_empty; pg++) {
-					total = extractDomains(pg * this._pasge_size);
+					total = extractDomains(pg * this._page_size);
 					// if found, reset counter
 					if (total == 0) {
 						emptyPage++;
