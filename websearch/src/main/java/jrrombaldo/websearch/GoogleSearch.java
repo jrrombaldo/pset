@@ -25,7 +25,7 @@ public class GoogleSearch extends AbstractSearch {
 
         this._searchEngineURL = "https://www.google.com.br/search?start={1}&q={0}";
         this._dork_include = "site:";
-        this._dork_exclude = "-inurl:";
+        this._dork_exclude = "-site:";
         this._regex = "://[\\d\\w_-]+\\." + targetDomain;
 
         this._captcha_img_url = "http://ipv4.google.com/sorry/image?id={0}&hl=en";
