@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package jrrombaldo.websearch.gui;
+package jrrombaldo.set.gui;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -14,8 +14,9 @@ import java.util.Set;
 import javax.swing.JTextArea;
 import javax.swing.SwingWorker;
 import javax.swing.tree.DefaultMutableTreeNode;
-import jrrombaldo.websearch.BingSearch;
-import jrrombaldo.websearch.GoogleSearch;
+
+import jrrombaldo.set.BingSearch;
+import jrrombaldo.set.GoogleSearch;
 
 /**
  *

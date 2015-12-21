@@ -1,4 +1,4 @@
-package jrrombaldo.websearch.gui;
+package jrrombaldo.set.gui;
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;

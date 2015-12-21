@@ -1,4 +1,4 @@
-package jrrombaldo.websearch;
+package jrrombaldo.set;
 
 import java.awt.image.BufferedImage;
 import java.io.File;

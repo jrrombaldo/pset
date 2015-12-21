@@ -1,4 +1,4 @@
-package jrrombaldo.websearch;
+package jrrombaldo.set;
 
 public class ScanConfig {
 

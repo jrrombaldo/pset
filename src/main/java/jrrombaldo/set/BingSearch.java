@@ -1,4 +1,4 @@
-package jrrombaldo.websearch;
+package jrrombaldo.set;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
