@@ -6,3 +6,7 @@
 *.prefs
 
 *.DS_Store
+
+.settings/
+
+target/*
