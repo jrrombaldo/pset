@@ -10,3 +10,5 @@
 .settings/
 
 target/*
+
+nbactions.xml

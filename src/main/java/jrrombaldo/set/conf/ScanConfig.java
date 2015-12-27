@@ -1,4 +1,4 @@
-package jrrombaldo.set;
+package jrrombaldo.set.conf;
 
 public class ScanConfig {
 
@@ -16,10 +16,10 @@ public class ScanConfig {
     }
 
     // performance improvements
-    public int _dork_max = 30;
-    public int _page_max_empty = 10;
+    public int _dork_max = 100;
+    public int _page_max_empty = 25;
     public int _page_max_num = 100;
-    public int _page_size = 25;
+    public int _page_size = 30;
 
     // proxy usage
     public boolean _useProxy = false;

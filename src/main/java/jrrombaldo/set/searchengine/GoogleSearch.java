@@ -1,14 +1,15 @@
-package jrrombaldo.set;
+package jrrombaldo.set.searchengine;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
-import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -51,7 +52,9 @@ public class GoogleSearch extends AbstractSearch {
                     URLEncoder.encode(url.toString(), "UTF-8"), id, captcha);
 
             //submitting captcha validation and closing connection
-            this.getHTTPConnection(new URL(captchaURL)).disconnect();
+            HttpURLConnection conn = this.getHTTPConnection(new URL(captchaURL));
+            conn.getResponseCode();
+            conn.disconnect();
         }
     }
 
@@ -64,8 +67,7 @@ public class GoogleSearch extends AbstractSearch {
         BufferedImage captchaBuff = ImageIO.read(new File(imagePath));
         JLabel captahImage = new JLabel(new ImageIcon(captchaBuff));
 
-        JOptionPane captchaPane = new JOptionPane();
-        String captchaValue = captchaPane.showInputDialog(null, captahImage, "Captcha required", JOptionPane.PLAIN_MESSAGE);
+        String captchaValue = JOptionPane.showInputDialog(null, captahImage, "Captcha required", JOptionPane.PLAIN_MESSAGE);
         System.out.println(captchaValue);
 
         return captchaValue;
@@ -79,7 +81,7 @@ public class GoogleSearch extends AbstractSearch {
 
             GoogleSearch gs = new GoogleSearch(domain);
 
-            // gs.setProxy("localhost", 8989);
+            gs.setProxy("localhost", 8989);
             int q = 1;
             for (String s : gs.listSubdomains()) {
                 if (q == 1) {

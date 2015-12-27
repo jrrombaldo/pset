@@ -1,4 +1,4 @@
-package jrrombaldo.set;
+package jrrombaldo.set.searchengine;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
@@ -34,6 +34,8 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import jrrombaldo.set.conf.ScanConfig;
+
 public abstract class AbstractSearch {
 
     // have to force this user agent header to for force the search engine
@@ -49,11 +51,11 @@ public abstract class AbstractSearch {
 
     // scan setup
     protected String _targetDomain;
-    protected Set<String> _subDomainsFounded;
+    protected Set<String> _subDomainsFound;
 
     public AbstractSearch(String targetDomain) {
         this._targetDomain = targetDomain;
-        this._subDomainsFounded = new HashSet<String>();
+        this._subDomainsFound = new HashSet<String>();
 
         // ensure that cookies will be persisted
         CookieHandler.setDefault(new CookieManager(null, CookiePolicy.ACCEPT_ALL));
@@ -68,7 +70,7 @@ public abstract class AbstractSearch {
         sb.append(this._targetDomain);
 
         int count = 0;
-        for (String subDomain : this._subDomainsFounded) {
+        for (String subDomain : this._subDomainsFound) {
             sb.append("+");
             sb.append(this._dork_exclude);
             sb.append(subDomain);
@@ -98,9 +100,9 @@ public abstract class AbstractSearch {
         HttpURLConnection httpConnection = ((HttpURLConnection) urlConnection);
         // httpConnection.setInstanceFollowRedirects(false);
 
-        int httpStatusCode = httpConnection.getResponseCode();
-        int httpLength = httpConnection.getContentLength();
-        //System.out.println(MessageFormat.format("Requesting - [{0}] - {1}", httpStatusCode, url));
+//        int httpStatusCode = httpConnection.getResponseCode();
+//        int httpLength = httpConnection.getContentLength();
+//        System.out.println(MessageFormat.format("Requesting - [{0}] - {1}", httpStatusCode, url));
 
         return httpConnection;
     }
@@ -116,7 +118,7 @@ public abstract class AbstractSearch {
         StringBuilder sb = new StringBuilder();
         BufferedReader br;
         try {
-            if (httpStatusCode > 400) {
+            if (httpStatusCode > 400 && httpStatusCode != 404 ) {
                 br = new BufferedReader(new InputStreamReader(httpConnection.getErrorStream()));
             } else {
                 br = new BufferedReader(new InputStreamReader(httpConnection.getInputStream()));
@@ -146,12 +148,12 @@ public abstract class AbstractSearch {
         Pattern pattern = Pattern.compile(this._regex);
         Matcher matcher = pattern.matcher(content);
 
-        int sizeBefore = this._subDomainsFounded.size();
+        int sizeBefore = this._subDomainsFound.size();
 
         while (matcher.find()) {
             String fnd = matcher.group();
 
-            // clean up subdomain founded
+            // clean up subdomain found
             fnd = fnd.replaceFirst("://", "").replace(this._targetDomain, "");
 
             if (fnd.startsWith("3A")) {
@@ -160,11 +162,11 @@ public abstract class AbstractSearch {
             if (fnd.startsWith("3a")) {
                 fnd = fnd.replaceFirst("3a", "");
             }
-            this._subDomainsFounded.add(fnd+this._targetDomain);
+            this._subDomainsFound.add(fnd+this._targetDomain);
         }
 
-        int founds = (this._subDomainsFounded.size() - sizeBefore);
-        System.out.println(MessageFormat.format("founded:[{0}]", founds));
+        int founds = (this._subDomainsFound.size() - sizeBefore);
+        System.out.println(MessageFormat.format("found:[{0}]", founds));
         return founds;
     }
 
@@ -191,7 +193,7 @@ public abstract class AbstractSearch {
 
         } while (total > 0);
 
-        return this._subDomainsFounded;
+        return this._subDomainsFound;
     }
 
     // used to download captcha images
