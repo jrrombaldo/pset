@@ -12,3 +12,4 @@
 target/*
 
 nbactions.xml
+/target/
