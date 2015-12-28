@@ -1,4 +1,4 @@
-package jrrombaldo.set.gui;
+package jrrombaldo.pset.gui;
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;

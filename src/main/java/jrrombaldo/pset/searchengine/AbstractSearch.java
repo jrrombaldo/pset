@@ -1,4 +1,4 @@
-package jrrombaldo.set.searchengine;
+package jrrombaldo.pset.searchengine;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
@@ -34,7 +34,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import jrrombaldo.set.conf.ScanConfig;
+import jrrombaldo.pset.conf.ScanConfig;
 
 public abstract class AbstractSearch {
 

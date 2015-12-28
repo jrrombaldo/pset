@@ -1,4 +1,4 @@
-package jrrombaldo.set;
+package jrrombaldo.pset;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,11 +14,11 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-import jrrombaldo.set.gui.WebSearchMainForm;
-import jrrombaldo.set.searchengine.BingSearch;
-import jrrombaldo.set.searchengine.GoogleSearch;
+import jrrombaldo.pset.gui.WebSearchMainForm;
+import jrrombaldo.pset.searchengine.BingSearch;
+import jrrombaldo.pset.searchengine.GoogleSearch;
 
-public class SETMain {
+public class PSETMain {
 
 	public static void main(String[] args) {
 

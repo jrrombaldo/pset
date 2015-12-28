@@ -1,4 +1,4 @@
-package jrrombaldo.set.conf;
+package jrrombaldo.pset.conf;
 
 public class ScanConfig {
 

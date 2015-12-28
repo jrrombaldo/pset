@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package jrrombaldo.set.gui;
+package jrrombaldo.pset.gui;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -15,8 +15,8 @@ import javax.swing.JTextArea;
 import javax.swing.SwingWorker;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import jrrombaldo.set.searchengine.BingSearch;
-import jrrombaldo.set.searchengine.GoogleSearch;
+import jrrombaldo.pset.searchengine.BingSearch;
+import jrrombaldo.pset.searchengine.GoogleSearch;
 
 /**
  *
@@ -64,7 +64,6 @@ public class WebSearchMainForm extends javax.swing.JFrame {
         bingChckBox = new javax.swing.JCheckBox();
         goBtn = new javax.swing.JButton();
         totalLbl = new javax.swing.JLabel();
-        googleChckBox1 = new javax.swing.JCheckBox();
 
         javax.swing.GroupLayout jDialog1Layout = new javax.swing.GroupLayout(jDialog1.getContentPane());
         jDialog1.getContentPane().setLayout(jDialog1Layout);
@@ -157,15 +156,6 @@ public class WebSearchMainForm extends javax.swing.JFrame {
 
         totalLbl.setForeground(new java.awt.Color(235, 170, 34));
 
-        googleChckBox1.setFont(new java.awt.Font("Helvetica", 0, 14)); // NOI18N
-        googleChckBox1.setForeground(new java.awt.Color(235, 170, 34));
-        googleChckBox1.setText("DNS Zone Transfer (intrusive)");
-        googleChckBox1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                googleChckBox1ActionPerformed(evt);
-            }
-        });
-
         MainPanel.setLayer(jScrollPane3, javax.swing.JLayeredPane.DEFAULT_LAYER);
         MainPanel.setLayer(jScrollPane4, javax.swing.JLayeredPane.DEFAULT_LAYER);
         MainPanel.setLayer(jLabel2, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -174,7 +164,6 @@ public class WebSearchMainForm extends javax.swing.JFrame {
         MainPanel.setLayer(bingChckBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
         MainPanel.setLayer(goBtn, javax.swing.JLayeredPane.DEFAULT_LAYER);
         MainPanel.setLayer(totalLbl, javax.swing.JLayeredPane.DEFAULT_LAYER);
-        MainPanel.setLayer(googleChckBox1, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
         javax.swing.GroupLayout MainPanelLayout = new javax.swing.GroupLayout(MainPanel);
         MainPanel.setLayout(MainPanelLayout);
@@ -189,16 +178,13 @@ public class WebSearchMainForm extends javax.swing.JFrame {
                             .addGroup(MainPanelLayout.createSequentialGroup()
                                 .addGroup(MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGroup(MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                        .addComponent(googleChckBox1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(googleChckBox, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 223, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(googleChckBox, javax.swing.GroupLayout.PREFERRED_SIZE, 223, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 223, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(targetTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 223, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(0, 36, Short.MAX_VALUE))))
                     .addGroup(MainPanelLayout.createSequentialGroup()
                         .addGap(55, 55, 55)
-                        .addComponent(goBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(goBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(4, 4, 4)
                 .addGroup(MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 279, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -220,11 +206,9 @@ public class WebSearchMainForm extends javax.swing.JFrame {
                         .addComponent(bingChckBox)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(googleChckBox)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(googleChckBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(29, 29, 29)
+                        .addGap(42, 42, 42)
                         .addComponent(goBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(34, 34, 34)
+                        .addGap(50, 50, 50)
                         .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 221, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane3))
                 .addGap(29, 29, 29))
@@ -245,10 +229,6 @@ public class WebSearchMainForm extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void googleChckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_googleChckBox1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_googleChckBox1ActionPerformed
 
     private void goBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_goBtnActionPerformed
 
@@ -297,7 +277,6 @@ public class WebSearchMainForm extends javax.swing.JFrame {
     private javax.swing.JTextArea consoleTxt;
     private javax.swing.JButton goBtn;
     private javax.swing.JCheckBox googleChckBox;
-    private javax.swing.JCheckBox googleChckBox1;
     private javax.swing.JDialog jDialog1;
     private javax.swing.JDialog jDialog2;
     private javax.swing.JDialog jDialog3;
