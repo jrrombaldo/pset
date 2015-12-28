@@ -1,4 +1,5 @@
-//package jrrombaldo.set.dns;
+package jrrombaldo.pset.dns;
+//package jrrombaldo.pset.dns;
 //
 //import java.io.IOException;
 //import java.net.InetAddress;

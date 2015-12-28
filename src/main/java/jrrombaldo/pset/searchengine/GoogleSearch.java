@@ -1,4 +1,4 @@
-package jrrombaldo.set.searchengine;
+package jrrombaldo.pset.searchengine;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
