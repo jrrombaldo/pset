@@ -19,13 +19,14 @@
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>
-					<finalName>${project.name}</finalName>
+					<finalName>${project.name}-${project.version}</finalName>
 					<appendAssemblyId>false</appendAssemblyId>
+					<outputDirectory>${project.build.directory}/../</outputDirectory>
 					<archive>
 						<manifest>
 							<classpathPrefix>lib/</classpathPrefix>
 							<addClasspath>true</addClasspath>
-							<mainClass>jrrombaldo.set.SETMain</mainClass>
+							<mainClass>jrrombaldo.pset.PSETMain</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>

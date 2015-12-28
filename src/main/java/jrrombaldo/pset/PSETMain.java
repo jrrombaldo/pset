@@ -116,7 +116,7 @@ public class PSETMain {
 
 	private static void printHelp(Options options) {
 		HelpFormatter formatter = new HelpFormatter();
-		formatter.printHelp("java -jar set.jar [at least on search engine] target.com", options);
+		formatter.printHelp("java -jar pset.jar [at least on search engine] target.com", options);
 	}
 
 	private static void startGuiVersion(String domain) {
