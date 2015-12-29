@@ -41,6 +41,13 @@ public class PSETMain {
 				return;
 			}
 			
+			//start gui e do nothing else
+			if (! line.hasOption("d")) {
+				System.out.println( "a target domain is required, none was specified!");
+				printHelp(options);
+				return;
+			}
+			
 			
 			if (!line.hasOption("g") && !line.hasOption("b")){
 				System.out.println("No search engine selected, at least one should be present");
@@ -105,7 +112,7 @@ public class PSETMain {
 		
 		
 		Option domain = new Option("d", "domain", true, "Target domain");
-		domain.setRequired(true);
+		//domain.setRequired(true);
 		options.addOption(domain);
 
 		Option proxy = new Option("p", "proxy", true, "Use HTTP proxy format: host:port");

@@ -38,198 +38,204 @@ import jrrombaldo.pset.conf.ScanConfig;
 
 public abstract class AbstractSearch {
 
-    // have to force this user agent header to for force the search engine
-    // answer non JavaScript "obfuscated" content
-    protected String _userAgent = "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)";
+	// have to force this user agent header to for force the search engine
+	// answer non JavaScript "obfuscated" content
+	protected String _userAgent = "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)";
 
-    // search engine specifics
-    protected String _searchEngineURL;
-    protected String _regex;
-    protected String _dork_include;
-    protected String _dork_exclude;
-    protected String _captchaExempltionCookie;
+	// search engine specifics
+	protected String _searchEngineURL;
+	protected String _regex;
+	protected String _dork_include;
+	protected String _dork_exclude;
+	protected String _captchaExempltionCookie;
 
-    // scan setup
-    protected String _targetDomain;
-    protected Set<String> _subDomainsFound;
+	// scan setup
+	protected String _targetDomain;
+	protected Set<String> _subDomainsFound;
 
-    public AbstractSearch(String targetDomain) {
-        this._targetDomain = targetDomain;
-        this._subDomainsFound = new HashSet<String>();
+	public AbstractSearch(String targetDomain) {
+		this._targetDomain = targetDomain;
+		this._subDomainsFound = new HashSet<String>();
 
-        // ensure that cookies will be persisted
-        CookieHandler.setDefault(new CookieManager(null, CookiePolicy.ACCEPT_ALL));
-    }
+		// ensure that cookies will be persisted
+		CookieHandler.setDefault(new CookieManager(null, CookiePolicy.ACCEPT_ALL));
+	}
 
-    abstract void handleCaptcha(URL url, int httpStatusCode, String content)
-            throws MalformedURLException, IOException, URISyntaxException, Exception;
+	abstract void handleCaptcha(URL url, int httpStatusCode, String content)
+			throws MalformedURLException, IOException, URISyntaxException, Exception;
 
-    protected String makeURL(int page) throws Exception {
-        StringBuilder sb = new StringBuilder();
-        sb.append(this._dork_include);
-        sb.append(this._targetDomain);
+	protected String makeURL(int page) throws Exception {
+		StringBuilder sb = new StringBuilder();
+		sb.append(this._dork_include);
+		sb.append(this._targetDomain);
 
-        int count = 0;
-        for (String subDomain : this._subDomainsFound) {
-            sb.append("+");
-            sb.append(this._dork_exclude);
-            sb.append(subDomain);
-            count++;
-            if (count >= ScanConfig.get()._dork_max) {
-                break;
-            }
-        }
-        return MessageFormat.format(this._searchEngineURL, sb.toString(), page);
-    }
+		int count = 0;
+		for (String subDomain : this._subDomainsFound) {
+			sb.append("+");
+			sb.append(this._dork_exclude);
+			sb.append(subDomain);
+			count++;
+			if (count >= ScanConfig.get()._dork_max) {
+				break;
+			}
+		}
+		return MessageFormat.format(this._searchEngineURL, sb.toString(), page);
+	}
 
-    protected HttpURLConnection getHTTPConnection(URL url) throws MalformedURLException, Exception, IOException {
-        URLConnection urlConnection;
+	protected HttpURLConnection getHTTPConnection(URL url) throws MalformedURLException, Exception, IOException {
+		URLConnection urlConnection;
 
-        // ignoring SSL server certificate
-        confidInavlidSSL();
+		// ignoring SSL server certificate
+		confidInavlidSSL();
 
-        if (ScanConfig.get()._useProxy) {
-            Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(ScanConfig.get()._proxy, ScanConfig.get()._proxyPort));
+		if (ScanConfig.get()._useProxy) {
+			Proxy proxy = new Proxy(Proxy.Type.HTTP,
+					new InetSocketAddress(ScanConfig.get()._proxy, ScanConfig.get()._proxyPort));
 
-            urlConnection = url.openConnection(proxy);
-        } else {
-            urlConnection = url.openConnection();
-        }
-        urlConnection.addRequestProperty("User-agent", this._userAgent);
+			urlConnection = url.openConnection(proxy);
+		} else {
+			urlConnection = url.openConnection();
+		}
+		urlConnection.addRequestProperty("User-agent", this._userAgent);
 
-        HttpURLConnection httpConnection = ((HttpURLConnection) urlConnection);
-        // httpConnection.setInstanceFollowRedirects(false);
+		HttpURLConnection httpConnection = ((HttpURLConnection) urlConnection);
+		// httpConnection.setInstanceFollowRedirects(false);
 
-//        int httpStatusCode = httpConnection.getResponseCode();
-//        int httpLength = httpConnection.getContentLength();
-//        System.out.println(MessageFormat.format("Requesting - [{0}] - {1}", httpStatusCode, url));
+		// int httpStatusCode = httpConnection.getResponseCode();
+		// int httpLength = httpConnection.getContentLength();
+		// System.out.println(MessageFormat.format("Requesting - [{0}] - {1}",
+		// httpStatusCode, url));
 
-        return httpConnection;
-    }
+		return httpConnection;
+	}
 
-    protected String parsetHTTPContent(int pageNumber) throws Exception {
-        URL url = new URL(makeURL(pageNumber));
-        HttpURLConnection httpConnection = getHTTPConnection(url);
+	protected String parsetHTTPContent(int pageNumber) throws Exception {
+		URL url = new URL(makeURL(pageNumber));
+		HttpURLConnection httpConnection = getHTTPConnection(url);
 
-        int httpStatusCode = httpConnection.getResponseCode();
+		int httpStatusCode = httpConnection.getResponseCode();
+		System.out.println("Requesting pg "+pageNumber+" - Status:" + httpStatusCode);
 
-        String line;
+		String line;
 
-        StringBuilder sb = new StringBuilder();
-        BufferedReader br;
-        try {
-            if (httpStatusCode > 400 && httpStatusCode != 404 ) {
-                br = new BufferedReader(new InputStreamReader(httpConnection.getErrorStream()));
-            } else {
-                br = new BufferedReader(new InputStreamReader(httpConnection.getInputStream()));
-            }
+		StringBuilder sb = new StringBuilder();
+		BufferedReader br;
+		try {
+			if (httpStatusCode == 404) {
+				return ""; //bing when reach a specific request size, return http status code 400
+			} else if (httpStatusCode > 400) {
+				br = new BufferedReader(new InputStreamReader(httpConnection.getErrorStream()));
+			} else {
+				br = new BufferedReader(new InputStreamReader(httpConnection.getInputStream()));
+			}
 
-            while ((line = br.readLine()) != null) {
-                sb.append(line);
-            }
+			while ((line = br.readLine()) != null) {
+				sb.append(line);
+			}
 
-            // most likely the search engine is asking for capatcha
-            if (httpStatusCode == 503) {
-                handleCaptcha(url, httpStatusCode, sb.toString());
-            }
+			// most likely the search engine is asking for capatcha
+			if (httpStatusCode == 503) {
+				handleCaptcha(url, httpStatusCode, sb.toString());
+			}
 
-        } catch (IOException e) {
-            // System.out.println("minor error, still processing... " +
-            // e.getLocalizedMessage());
-            e.printStackTrace();
-        }
+		} catch (IOException e) {
+			// System.out.println("minor error, still processing... " +
+			// e.getLocalizedMessage());
+			e.printStackTrace();
+		}
 
-        return sb.toString();
-    }
+		return sb.toString();
+	}
 
-    protected int extractDomains(int pageNumber) throws Exception {
-        String content = parsetHTTPContent(pageNumber);
+	protected int extractDomains(int pageNumber) throws Exception {
+		String content = parsetHTTPContent(pageNumber);
 
-        Pattern pattern = Pattern.compile(this._regex);
-        Matcher matcher = pattern.matcher(content);
+		Pattern pattern = Pattern.compile(this._regex);
+		Matcher matcher = pattern.matcher(content);
 
-        int sizeBefore = this._subDomainsFound.size();
+		int sizeBefore = this._subDomainsFound.size();
 
-        while (matcher.find()) {
-            String fnd = matcher.group();
+		while (matcher.find()) {
+			String fnd = matcher.group();
 
-            // clean up subdomain found
-            fnd = fnd.replaceFirst("://", "").replace(this._targetDomain, "");
+			// clean up subdomain found
+			fnd = fnd.replaceFirst("://", "").replace(this._targetDomain, "");
 
-            if (fnd.startsWith("3A")) {
-                fnd = fnd.replaceFirst("3A", "");
-            }
-            if (fnd.startsWith("3a")) {
-                fnd = fnd.replaceFirst("3a", "");
-            }
-            this._subDomainsFound.add(fnd+this._targetDomain);
-        }
+			if (fnd.startsWith("3A")) {
+				fnd = fnd.replaceFirst("3A", "");
+			}
+			if (fnd.startsWith("3a")) {
+				fnd = fnd.replaceFirst("3a", "");
+			}
+			this._subDomainsFound.add(fnd + this._targetDomain);
+		}
 
-        int founds = (this._subDomainsFound.size() - sizeBefore);
-        System.out.println(MessageFormat.format("found:[{0}]", founds));
-        return founds;
-    }
+		int founds = (this._subDomainsFound.size() - sizeBefore);
+		// System.out.println(MessageFormat.format("found:[{0}]", founds));
+		return founds;
+	}
 
-    public Set<String> listSubdomains() throws Exception {
-        int total;
-        do {
-            total = extractDomains(0);
-            /*
+	public Set<String> listSubdomains() throws Exception {
+		int total;
+		do {
+			total = extractDomains(0);
+			/*
 			 * if not found any new subdomain on current page, browse next pages
 			 * until reach maximum of empty pages set.
-             */
-            if (total == 0) {
-                int emptyPage = 0;
-                for (int pg = 0; pg < ScanConfig.get()._page_max_num && emptyPage < ScanConfig.get()._page_max_empty; pg++) {
-                    total = extractDomains(pg * ScanConfig.get()._page_size);
-                    // if found, reset counter
-                    if (total == 0) {
-                        emptyPage++;
-                    } else {
-                        emptyPage = 0;
-                    }
-                }
-            }
+			 */
+			if (total == 0) {
+				int emptyPage = 0;
+				for (int pg = 0; pg < ScanConfig.get()._page_max_num
+						&& emptyPage < ScanConfig.get()._page_max_empty; pg++) {
+					total = extractDomains(pg * ScanConfig.get()._page_size);
+					// if found, reset counter
+					if (total == 0) {
+						emptyPage++;
+					} else {
+						emptyPage = 0;
+					}
+				}
+			}
 
-        } while (total > 0);
+		} while (total > 0);
 
-        return this._subDomainsFound;
-    }
+		return this._subDomainsFound;
+	}
 
-    // used to download captcha images
-    protected void downloadImage(String strURL, String imagePath) throws MalformedURLException, IOException, Exception {
-        HttpURLConnection imageUrlConnection;
-        imageUrlConnection = this.getHTTPConnection(new URL(strURL));
+	// used to download captcha images
+	protected void downloadImage(String strURL, String imagePath) throws MalformedURLException, IOException, Exception {
+		HttpURLConnection imageUrlConnection;
+		imageUrlConnection = this.getHTTPConnection(new URL(strURL));
 
-        InputStream is = new BufferedInputStream(imageUrlConnection.getInputStream());
-        BufferedImage image = ImageIO.read(is);
+		InputStream is = new BufferedInputStream(imageUrlConnection.getInputStream());
+		BufferedImage image = ImageIO.read(is);
 
-        ImageIO.write(image, "jpg", new File(imagePath));
-    }
+		ImageIO.write(image, "jpg", new File(imagePath));
+	}
 
-    protected void setProxy(String proxy, int port) {
-        ScanConfig.get()._useProxy = true;
-        ScanConfig.get()._proxy = proxy;
-        ScanConfig.get()._proxyPort = port;
-    }
+	protected void setProxy(String proxy, int port) {
+		ScanConfig.get()._useProxy = true;
+		ScanConfig.get()._proxy = proxy;
+		ScanConfig.get()._proxyPort = port;
+	}
 
-    protected void confidInavlidSSL() throws NoSuchAlgorithmException, KeyManagementException {
-        SSLContext ctx = SSLContext.getInstance("TLS");
-        ctx.init(new KeyManager[0], new TrustManager[]{new X509TrustManager() {
-            public void checkClientTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
-            }
+	protected void confidInavlidSSL() throws NoSuchAlgorithmException, KeyManagementException {
+		SSLContext ctx = SSLContext.getInstance("TLS");
+		ctx.init(new KeyManager[0], new TrustManager[] { new X509TrustManager() {
+			public void checkClientTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
+			}
 
-            public void checkServerTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
-            }
+			public void checkServerTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
+			}
 
-            public X509Certificate[] getAcceptedIssuers() {
-                return null;
-            }
-        }
+			public X509Certificate[] getAcceptedIssuers() {
+				return null;
+			}
+		}
 
-        }, new SecureRandom());
+		}, new SecureRandom());
 
-        SSLContext.setDefault(ctx);
-    }
+		SSLContext.setDefault(ctx);
+	}
 
 }

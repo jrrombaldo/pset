@@ -18,8 +18,8 @@ public class ScanConfig {
     // performance improvements
     public int _dork_max = 100;
     public int _page_max_empty = 25;
-    public int _page_max_num = 100;
-    public int _page_size = 30;
+    public int _page_max_num = 9999;
+    public int _page_size = 10;
 
     // proxy usage
     public boolean _useProxy = false;
