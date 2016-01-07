@@ -31,20 +31,21 @@
         <h3>
 <a id="pset" class="anchor" href="#pset" aria-hidden="true"><span class="octicon octicon-link"></span></a>PSET</h3>
 
-<p>PSET stands for Passive Subdomain Enumeration Tool, which goal is: given a domain PSET will enumerate all subdomains passively by probing search engines such as Goole.com and Bing.com. PSET will never directly probe any DNS and server or any host belonging to target domain. Making enumeration scans 100% stealth and undetectable.</p>
+<p>PSET stands for Passive Subdomain Enumeration Tool, which goal is: given a domain PSET will enumerate all subdomains passively by probing search engines such as Goole.com and Bing.com. PSET will never directly probe any DNS and/or host on target domain, making enumeration scans 100% stealth and undetectable.</p>
 
-<p><a href="https://github.com/jrrombaldo/pset/blob/master/pset-0.1.jar">Download latest version</a></p>
+<p>PSET stands out among other enumeration tools because of the capacity to automate queries on Google and Bing. In past years several similar tools stop working because search engines are getting more and more strict against third party automation. PSET is able to bypass these restrictions by manipulating requests and removing complex JavaScript on responses.  </p>
+
+<p><a href="https://github.com/jrrombaldo/pset/blob/master/pset-0.1.jar">Download latest version here.</a></p>
 
 <h4>
 <a id="running" class="anchor" href="#running" aria-hidden="true"><span class="octicon octicon-link"></span></a>Running</h4>
 
-<p>Basically PSET can run using a java GUI or from CLI. Keep in mind that even on CLI mode it's opens an popup with captcha images, so in case you are on CLI only environment you wont't be able clear captchas when runs PSET multiple times.</p>
+<p>Basically PSET can run using a java GUI or from CLI. Keep in mind that even on CLI mode it's opens an popup with captcha images requested for some search engine when  run PSET multiple times, so in case you are on CLI only environment you wont't be able clear captchas. </p>
 
 <ol>
-<li><p>To run GUI mode it's just execute:<br>
-<code>java -jar pset-0.1.jar</code></p></li>
-<li><p>To run CLI mode execute the same jar passing -c param:<br>
-<code>java -jar pset-0.1.jar -c</code>. </p></li>
+<li>To run GUI mode it's just execute: <code>java -jar pset-0.1.jar</code>
+</li>
+<li>To run CLI mode execute the same jar passing -c param <code>java -jar pset-0.1.jar -c</code>. </li>
 </ol>
 
 <p>Here is an example of possible parameters:<br>
@@ -60,7 +61,7 @@
 <h4>
 <a id="download-and-compiling" class="anchor" href="#download-and-compiling" aria-hidden="true"><span class="octicon octicon-link"></span></a>Download and compiling</h4>
 
-<p>In order to download and compile PSET you must have <a href="https://maven.apache.org/download.cgi">apache maven</a>, <a href="https://git-scm.com/downloads">git</a> and <a href="http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html">java development kit 8</a> installed, as they are required to build/compile the source code into jar file.</p>
+<p>In order to download and compile PSET you must have <a href="https://maven.apache.org/download.cgi">apache maven</a>, <a href="https://git-scm.com/downloads">git</a> and <a href="www.oracle.com/technetwork/java/javase/downloads/">java development kit 7</a> installed, as they are required to build/compile the source code into jar file.</p>
 
 <p>1- Download the latest version from github:<br>
  <code>git clone https://github.com/jrrombaldo/pset</code></p>
@@ -69,6 +70,8 @@
  <code>cd pset &amp;&amp; mvn clean install</code></p>
 
 <p>It's done, the final jar will at <code>pset/pset-0.1.jar</code>, follow the steps to execute it.</p>
+
+<p>Thank you!</p>
       </section>
     </div>
 
