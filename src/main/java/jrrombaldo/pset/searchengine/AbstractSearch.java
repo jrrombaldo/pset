@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 jrrombaldo.
+ * Copyright (c) 2016 Jr.Rombaldo.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -48,10 +48,6 @@ import jrrombaldo.pset.conf.ScanConfig;
 
 public abstract class AbstractSearch {
 
-	// have to force this user agent header to for force the search engine
-	// answer non JavaScript "obfuscated" content
-	protected String _userAgent = "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)";
-
 	// search engine specifics
 	protected String _searchEngineURL;
 	protected String _regex;
@@ -85,7 +81,7 @@ public abstract class AbstractSearch {
 			sb.append(this._dork_exclude);
 			sb.append(subDomain);
 			count++;
-			if (count >= ScanConfig.get()._dork_max) {
+			if (count >= ScanConfig.get().dork_max) {
 				break;
 			}
 		}
@@ -98,15 +94,15 @@ public abstract class AbstractSearch {
 		// ignoring SSL server certificate
 		confidInavlidSSL();
 
-		if (ScanConfig.get()._useProxy) {
+		if (ScanConfig.get().useProxy) {
 			Proxy proxy = new Proxy(Proxy.Type.HTTP,
-					new InetSocketAddress(ScanConfig.get()._proxy, ScanConfig.get()._proxyPort));
+					new InetSocketAddress(ScanConfig.get().proxy, ScanConfig.get().proxyPort));
 
 			urlConnection = url.openConnection(proxy);
 		} else {
 			urlConnection = url.openConnection();
 		}
-		urlConnection.addRequestProperty("User-agent", this._userAgent);
+		urlConnection.addRequestProperty("User-agent", ScanConfig.get().userAgent);
 
 		HttpURLConnection httpConnection = ((HttpURLConnection) urlConnection);
 		// httpConnection.setInstanceFollowRedirects(false);
@@ -124,7 +120,7 @@ public abstract class AbstractSearch {
 		HttpURLConnection httpConnection = getHTTPConnection(url);
 
 		int httpStatusCode = httpConnection.getResponseCode();
-		System.out.println("Requesting pg "+pageNumber+" - Status:" + httpStatusCode);
+		System.out.println("Requesting pg " + pageNumber + " - Status:" + httpStatusCode);
 
 		String line;
 
@@ -132,7 +128,8 @@ public abstract class AbstractSearch {
 		BufferedReader br;
 		try {
 			if (httpStatusCode == 404) {
-				return ""; //bing when reach a specific request size, return http status code 400
+				return ""; // bing when reach a specific request size, return
+							// http status code 400
 			} else if (httpStatusCode > 400) {
 				br = new BufferedReader(new InputStreamReader(httpConnection.getErrorStream()));
 			} else {
@@ -195,9 +192,9 @@ public abstract class AbstractSearch {
 			 */
 			if (total == 0) {
 				int emptyPage = 0;
-				for (int pg = 0; pg < ScanConfig.get()._page_max_num
-						&& emptyPage < ScanConfig.get()._page_max_empty; pg++) {
-					total = extractDomains(pg * ScanConfig.get()._page_size);
+				for (int pg = 0; pg < ScanConfig.get().page_max_num
+						&& emptyPage < ScanConfig.get().page_max_empty; pg++) {
+					total = extractDomains(pg * ScanConfig.get().page_size);
 					// if found, reset counter
 					if (total == 0) {
 						emptyPage++;
@@ -224,20 +221,23 @@ public abstract class AbstractSearch {
 	}
 
 	protected void setProxy(String proxy, int port) {
-		ScanConfig.get()._useProxy = true;
-		ScanConfig.get()._proxy = proxy;
-		ScanConfig.get()._proxyPort = port;
+		ScanConfig.get().useProxy = true;
+		ScanConfig.get().proxy = proxy;
+		ScanConfig.get().proxyPort = port;
 	}
 
 	protected void confidInavlidSSL() throws NoSuchAlgorithmException, KeyManagementException {
 		SSLContext ctx = SSLContext.getInstance("TLS");
 		ctx.init(new KeyManager[0], new TrustManager[] { new X509TrustManager() {
+			@Override
 			public void checkClientTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
 			}
 
+			@Override
 			public void checkServerTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
 			}
 
+			@Override
 			public X509Certificate[] getAcceptedIssuers() {
 				return null;
 			}

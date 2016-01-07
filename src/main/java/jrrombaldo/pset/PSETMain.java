@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 jrrombaldo.
+ * Copyright (c) 2016 Jr.Rombaldo.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  *******************************************************************************/
 package jrrombaldo.pset;
 
+import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -36,64 +37,60 @@ public class PSETMain {
 		CommandLineParser parser = new DefaultParser();
 		try {
 			CommandLine line = parser.parse(options, args);
-			
+
 			String domain = line.getOptionValue("d");
 
-			//print help
+			// print help
 			if (line.hasOption("h")) {
 				printHelp(options);
 				return;
 			}
-			
-			//start gui e do nothing else
-			if (! line.hasOption("c")) {
+
+			// start gui e do nothing else
+			if (!line.hasOption("c")) {
 				startGuiVersion(domain);
 				return;
 			}
-			
-			//start gui e do nothing else
-			if (! line.hasOption("d")) {
-				System.out.println( "a target domain is required, none was specified!");
+
+			// start gui e do nothing else
+			if (!line.hasOption("d")) {
+				System.out.println("a target domain is required, none was specified!");
 				printHelp(options);
 				return;
 			}
-			
-			
-			if (!line.hasOption("g") && !line.hasOption("b")){
+
+			if (!line.hasOption("g") && !line.hasOption("b")) {
 				System.out.println("No search engine selected, at least one should be present");
 				printHelp(options);
 				return;
 			}
-			
-			if (line.hasOption("p")){
+
+			if (line.hasOption("p")) {
 				String proxy = line.getOptionValue("p");
 				System.out.println(proxy);
 			}
-			
-			
+
 			Set<String> results = new HashSet<>();
-		
-			if (line.hasOption("g")){
+
+			if (line.hasOption("g")) {
 				results.addAll(new GoogleSearch(domain).listSubdomains());
 			}
-			
-			if (line.hasOption("b")){
+
+			if (line.hasOption("b")) {
 				results.addAll(new BingSearch(domain).listSubdomains());
 			}
-			
-			
-			 List<String> sortedResult = new ArrayList<String>(results);
-             Collections.sort(sortedResult);
-             int q =1;
-             for (String subDomain : sortedResult) {
-            	 if (q == 1) {
-                     System.out.println("\nResults:");
-                 }
-                 System.out.println(q + ": "+subDomain);
-                 q++;
-             }
-			
-		
+
+			List<String> sortedResult = new ArrayList<String>(results);
+			Collections.sort(sortedResult);
+			int q = 1;
+			for (String subDomain : sortedResult) {
+				if (q == 1) {
+					System.out.println("\nResults:");
+				}
+				System.out.println(q + ": " + subDomain);
+				q++;
+			}
+
 		} catch (ParseException exp) {
 			System.out.println(exp.getLocalizedMessage());
 			printHelp(options);
@@ -119,10 +116,9 @@ public class PSETMain {
 		// searchEngine.setRequired(true);
 		// options.addOptionGroup(searchEngine);
 		options.addOption(google).addOption(bing);
-		
-		
+
 		Option domain = new Option("d", "domain", true, "Target domain");
-		//domain.setRequired(true);
+		// domain.setRequired(true);
 		options.addOption(domain);
 
 		Option proxy = new Option("p", "proxy", true, "Use HTTP proxy format: host:port");
@@ -136,7 +132,7 @@ public class PSETMain {
 		formatter.printHelp("java -jar pset.jar [at least on search engine] target.com", options);
 	}
 
-	private static void startGuiVersion(String domain) {
+	private static void startGuiVersion(final String domain) {
 
 		/* Set the Nimbus look and feel */
 		/*
@@ -159,8 +155,20 @@ public class PSETMain {
 		}
 
 		/* Create and display the form */
-		java.awt.EventQueue.invokeLater(() -> {
-			new WebSearchMainForm(domain).setVisible(true);
+		// Java 8 required
+		// java.awt.EventQueue.invokeLater(() -> {
+		// new WebSearchMainForm(domain).setVisible(true);
+		// });
+
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					new WebSearchMainForm(domain).setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
 		});
 	}
 
