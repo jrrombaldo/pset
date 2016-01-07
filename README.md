@@ -1,9 +1,10 @@
 ###PSET
 PSET stands for Passive Subdomain Enumeration Tool, which goal is: given a domain PSET will enumerate all subdomains passively by probing search engines such as Goole.com and Bing.com. PSET will never directly probe any DNS and/or host on target domain, making enumeration scans 100% stealth and undetectable.
 
-PSET stands out among other enumeration tools because of the capacity to automate queries on Google and Bing. In past years several similar tools stop working because search engine getting more and more strict with searching automation tools. PSET is able to bypass these restrictions by manipulating requests and removing complex JavaScript on responses.  
+PSET stands out among other enumeration tools because of the capacity to automate queries on Google and Bing. In past years several similar tools stop working because search engines are getting more and more strict against third party automation. PSET is able to bypass these restrictions by manipulating requests and removing complex JavaScript on responses.  
 
-[Download latest version](https://github.com/jrrombaldo/pset/blob/master/pset-0.1.jar)
+[Download latest version here.](https://github.com/jrrombaldo/pset/blob/master/pset-0.1.jar)
+
 
 ####Running
 Basically PSET can run using a java GUI or from CLI. Keep in mind that even on CLI mode it's opens an popup with captcha images requested for some search engine when  run PSET multiple times, so in case you are on CLI only environment you wont't be able clear captchas. 
@@ -35,4 +36,13 @@ In order to download and compile PSET you must have [apache maven](https://maven
 
 
 It's done, the final jar will at `pset/pset-0.1.jar`, follow the steps to execute it.
+
+
+
+Thank you!
+
+
+
+
+
 
