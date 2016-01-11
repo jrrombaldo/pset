@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>jrrombaldo</groupId>
 	<artifactId>pset</artifactId>
-	<version>1.0</version>
+	<version>1.0.1</version>
 	<description>Passive Subdomain Enumeration Tool</description>
 
 	<dependencies>
