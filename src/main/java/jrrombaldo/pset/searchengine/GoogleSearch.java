@@ -47,7 +47,7 @@ public class GoogleSearch extends AbstractSearch {
 
 	@Override
 	void handleCaptcha(URL url, int httpStatusCode, String content) throws Exception {
-		String imagePath = "/Users/junior/Desktop/test.jpg";
+		String imagePath = "./pset-captcha.jpg";
 
 		String id = "";
 		Matcher matcher = Pattern.compile(this._captcha_regex).matcher(content);
